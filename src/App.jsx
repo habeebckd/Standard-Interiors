@@ -12,7 +12,38 @@ import p5 from '../assets/images/project-5.jpeg';
 import p6 from '../assets/images/project-6.jpeg';
 import p7 from '../assets/images/project-7.jpeg';
 import p8 from '../assets/images/project-8.jpeg';
+import w1 from '../workPhotos/WhatsApp Image 2026-03-25 at 3.02.18 PM.jpeg';
+import w2 from '../workPhotos/WhatsApp Image 2026-03-25 at 3.02.19 PM.jpeg';
+import w3 from '../workPhotos/WhatsApp Image 2026-03-25 at 3.02.21 PM.jpeg';
+import w4 from '../workPhotos/WhatsApp Image 2026-03-25 at 3.02.22 PM.jpeg';
+import w5 from '../workPhotos/WhatsApp Image 2026-03-25 at 3.02.25 PM.jpeg';
+import w6 from '../workPhotos/WhatsApp Image 2026-03-25 at 3.02.26 PM.jpeg';
+import w7 from '../workPhotos/WhatsApp Image 2026-03-25 at 3.02.27 PM.jpeg';
+import w8 from '../workPhotos/WhatsApp Image 2026-03-25 at 3.02.28 PM.jpeg';
 
+// Animation constants
+const REVEAL_EASE = [0.22, 1, 0.36, 1];
+const REVEAL_DURATION = 0.58;
+const FADE_DURATION = 0.4;
+
+const revealVariants = {
+  hidden: { opacity: 0, y: 18 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: REVEAL_DURATION, ease: REVEAL_EASE }
+  }
+};
+
+const fadeVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { duration: FADE_DURATION, ease: REVEAL_EASE }
+  }
+};
+
+// Data constants
 const portfolioItems = [
   { image: p2, title: 'Living Room Cove Lighting', text: 'Soft perimeter glow with budget-conscious detailing.' },
   { image: p3, title: 'Wood-Panel Ceiling Feature', text: 'Warm wood tones with modern gypsum framing.' },
@@ -51,14 +82,14 @@ const services = [
 ];
 
 const instagramItems = [
-  { image: p1, title: 'Warm Ceiling Finish', kind: 'reel' },
-  { image: p2, title: 'Living Room Ambience', kind: 'post' },
-  { image: p3, title: 'Wood Panel Detailing', kind: 'reel' },
-  { image: p4, title: 'Minimal Geometry Build', kind: 'post' },
-  { image: p5, title: 'Curtain & Lighting Pairing', kind: 'reel' },
-  { image: p6, title: 'Bedroom Transformation', kind: 'post' },
-  { image: p7, title: 'Statement Ceiling Concept', kind: 'reel' },
-  { image: p8, title: 'Premium Lounge Setup', kind: 'post' }
+  { image: w1, title: 'Premium Lounge Setup' },
+  { image: w2, title: 'Statement Ceiling Concept' },
+  { image: w3, title: 'Warm Ceiling Finish' },
+  { image: w4, title: 'Living Room Ambience' },
+  { image: w5, title: 'Curtain & Lighting Pairing' },
+  { image: w6, title: 'Bedroom Transformation' },
+  { image: w7, title: 'Wood Panel Detailing' },
+  { image: w8, title: 'Minimal Geometry Build' }
 ];
 
 const partnersHighlights = [
@@ -68,25 +99,6 @@ const partnersHighlights = [
   'Skilled & Dedicated Team'
 ];
 
-const revealEase = [0.22, 1, 0.36, 1];
-
-const revealVariants = {
-  hidden: { opacity: 0, y: 18 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.58, ease: revealEase }
-  }
-};
-
-const fadeVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { duration: 0.4, ease: revealEase }
-  }
-};
-
 function App() {
   const [scrolled, setScrolled] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -94,15 +106,14 @@ function App() {
   const [lightboxItem, setLightboxItem] = useState(null);
   const [formSubmitting, setFormSubmitting] = useState(false);
   const [formMessage, setFormMessage] = useState(null);
+  const [phoneScreenSrc, setPhoneScreenSrc] = useState('/WhatsApp Image 2026-04-21 at 3.33.11 PM.jpeg');
   const reduceMotion = useReducedMotion();
   const lastScrollYRef = useRef(0);
   const servicesRef = useRef(null);
   const servicesBgRef = useRef(null);
-  const servicesContentRef = useRef(null);
-  const servicesWireRef = useRef(null);
-  const servicesRealRef = useRef(null);
-  const servicesGlowRef = useRef(null);
   const servicesGridRef = useRef(null);
+  const instagramSectionRef = useRef(null);
+  const instagramPreviewRowRef = useRef(null);
 
   useEffect(() => {
     const onKeyDown = (event) => {
@@ -119,6 +130,8 @@ function App() {
 
   useEffect(() => {
     let ticking = false;
+    const SCROLL_THRESHOLD = 3;
+    const NAVBAR_SCROLL_POINT = 90;
 
     const onScroll = () => {
       if (ticking) return;
@@ -128,24 +141,22 @@ function App() {
         const y = window.scrollY;
         const delta = y - lastScrollYRef.current;
 
-        if (y < 90) {
+        if (y < NAVBAR_SCROLL_POINT) {
           setExpanded(false);
           setScrolled(false);
-        } else if (delta > 3) {
+        } else if (delta > SCROLL_THRESHOLD) {
           setScrolled(true);
-        } else if (delta < -3) {
+        } else if (delta < -SCROLL_THRESHOLD) {
           setExpanded(false);
           setScrolled(false);
         }
 
         lastScrollYRef.current = y;
-
         ticking = false;
       });
     };
 
     lastScrollYRef.current = window.scrollY;
-    onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -167,25 +178,76 @@ function App() {
     gsap.registerPlugin(ScrollTrigger);
     const mm = gsap.matchMedia();
 
+    const updateCarouselPosition = () => {
+      const row = instagramPreviewRowRef.current;
+      if (!row) return;
+
+      const cards = gsap.utils.toArray('.instagram-preview-card', row);
+      const rowBounds = row.getBoundingClientRect();
+      const rowCenter = rowBounds.left + rowBounds.width * 0.5;
+      
+      // Calculate closest card to center and assign positions
+      let closestCard = null;
+      let closestDistance = Infinity;
+      const cardPositions = [];
+
+      cards.forEach((card, idx) => {
+        const bounds = card.getBoundingClientRect();
+        const cardCenter = bounds.left + bounds.width * 0.5;
+        const distance = Math.abs(cardCenter - rowCenter);
+        
+        cardPositions.push({
+          card,
+          index: idx,
+          distance,
+          center: cardCenter
+        });
+
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestCard = card;
+        }
+      });
+
+      // Sort by distance from center
+      cardPositions.sort((a, b) => a.distance - b.distance);
+
+      // Remove all position classes
+      cards.forEach(card => {
+        card.classList.remove(
+          'is-center', 'is-left-1', 'is-left-2', 'is-right-1', 'is-right-2'
+        );
+      });
+
+      // Assign new positions based on sorted order
+      cardPositions.forEach((pos, sortedIdx) => {
+        if (sortedIdx === 0) {
+          pos.card.classList.add('is-center');
+        } else if (pos.center < rowCenter) {
+          // Left side cards
+          if (sortedIdx === 1) pos.card.classList.add('is-left-1');
+          else if (sortedIdx === 2) pos.card.classList.add('is-left-2');
+        } else {
+          // Right side cards
+          if (sortedIdx === 1) pos.card.classList.add('is-right-1');
+          else if (sortedIdx === 2) pos.card.classList.add('is-right-2');
+        }
+      });
+    };
+
+    const updateRowMotionBlur = (velocity) => {
+      const row = instagramPreviewRowRef.current;
+      if (!row) return;
+
+      const magnitude = Math.abs(velocity);
+      const blur = magnitude < 28 ? 0 : Math.min(magnitude / 3200, 0.8);
+      row.style.setProperty('--row-motion-blur', `${blur.toFixed(3)}px`);
+    };
+
     mm.add('(min-width: 769px)', () => {
       const cards = gsap.utils.toArray('.service-card', servicesGridRef.current);
 
-      gsap.set(servicesRealRef.current, { scaleX: 0.001, transformOrigin: 'left center' });
       gsap.set(cards, { y: 42, opacity: 0, scale: 0.95 });
-
-      gsap.timeline({
-        defaults: { ease: 'none' },
-        scrollTrigger: {
-          trigger: servicesRef.current,
-          start: 'top 78%',
-          end: 'bottom 32%',
-          scrub: 1.8
-        }
-      })
-        .fromTo(servicesWireRef.current, { opacity: 0.86 }, { opacity: 0.12 }, 0)
-        .fromTo(servicesRealRef.current, { scaleX: 0.001 }, { scaleX: 1 }, 0)
-        .fromTo(servicesGlowRef.current, { xPercent: -110, opacity: 0 }, { xPercent: 112, opacity: 0.3 }, 0)
-        .to(servicesGlowRef.current, { opacity: 0 }, 0.88);
 
       gsap.to(cards, {
         y: 0,
@@ -202,49 +264,26 @@ function App() {
       });
 
       gsap.fromTo(
-        servicesBgRef.current,
-        { yPercent: -1 },
+        instagramPreviewRowRef.current,
+        { xPercent: -9 },
         {
-          yPercent: 5,
+          xPercent: 12,
           ease: 'none',
           scrollTrigger: {
-            trigger: servicesRef.current,
+            trigger: instagramSectionRef.current,
             start: 'top bottom',
             end: 'bottom top',
-            scrub: 1.9
+            scrub: 1.45,
+            onUpdate: (self) => {
+              updateCarouselPosition();
+              updateRowMotionBlur(self.getVelocity());
+            },
+            onRefresh: () => updateCarouselPosition()
           }
         }
       );
 
-      gsap.fromTo(
-        servicesWireRef.current,
-        { yPercent: -2 },
-        {
-          yPercent: 8,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: servicesRef.current,
-            start: 'top bottom',
-            end: 'bottom top',
-            scrub: 1.9
-          }
-        }
-      );
-
-      gsap.fromTo(
-        servicesContentRef.current,
-        { yPercent: 2 },
-        {
-          yPercent: -10,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: servicesRef.current,
-            start: 'top bottom',
-            end: 'bottom top',
-            scrub: 1.7
-          }
-        }
-      );
+      gsap.delayedCall(0.08, updateCarouselPosition);
     });
 
     mm.add('(max-width: 768px)', () => {
@@ -300,24 +339,28 @@ function App() {
     setFormSubmitting(true);
     setFormMessage(null);
 
-    const form = new FormData(event.currentTarget);
-    const name = form.get('name') || '';
-    const phone = form.get('phone') || '';
-    const service = form.get('service') || 'Not specified';
-    const message = form.get('message') || '';
-    const text = `Hello Standard Interiors,%0A%0AMy name is ${encodeURIComponent(name)}.%0AMy contact number is ${encodeURIComponent(phone)}.%0AService needed: ${encodeURIComponent(service)}.%0A%0AProject details:%0A${encodeURIComponent(message)}`;
+    const formData = new FormData(event.currentTarget);
+    const name = formData.get('name') || '';
+    const phone = formData.get('phone') || '';
+    const service = formData.get('service') || 'Not specified';
+    const message = formData.get('message') || '';
+
+    const whatsappText = `Hello Standard Interiors,%0A%0AMy name is ${encodeURIComponent(name)}.%0AMy contact number is ${encodeURIComponent(phone)}.%0AService needed: ${encodeURIComponent(service)}.%0A%0AProject details:%0A${encodeURIComponent(message)}`;
+    const whatsappUrl = `https://wa.me/919947015742?text=${whatsappText}`;
 
     setTimeout(() => {
-      window.open(`https://wa.me/919947015742?text=${text}`, '_blank', 'noopener');
+      window.open(whatsappUrl, '_blank', 'noopener');
       setFormSubmitting(false);
       setFormMessage({ type: 'success', text: 'Redirecting to WhatsApp...' });
       event.currentTarget.reset();
-
       setTimeout(() => setFormMessage(null), 3000);
     }, 300);
   };
 
   const navClass = `navbar ${scrolled ? 'is-short' : ''} ${expanded ? 'is-open' : ''}`;
+  const phoneReel = { image: w6, title: 'Bedroom Transformation' };
+  const trailReels = [instagramItems[1], instagramItems[2], instagramItems[3]];
+  const visibleReels = [instagramItems[1], instagramItems[2], instagramItems[3], instagramItems[4], instagramItems[5]];
 
   return (
     <div className="app">
@@ -358,7 +401,7 @@ function App() {
               initial={reduceMotion ? false : { opacity: 0, y: -10 }}
               animate={reduceMotion ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
               exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -8 }}
-              transition={{ duration: 0.2, ease: revealEase }}
+              transition={{ duration: 0.2, ease: REVEAL_EASE }}
             >
               <a href="#home" onClick={() => setMenuOpen(false)}>Home</a>
               <a href="#services" onClick={() => setMenuOpen(false)}>Services</a>
@@ -391,18 +434,11 @@ function App() {
             aria-hidden="true"
             ref={servicesBgRef}
           >
-            <img src={p8} alt="Modern interior background" className="services-bg-image" />
-            <div className="services-wire-overlay" ref={servicesWireRef}>
-              <img src={p8} alt="Interior wireframe layer" className="services-wire-image" />
-              <div className="services-wire-grid" />
-            </div>
-            <div className="services-real-reveal" ref={servicesRealRef}>
-              <img src={p8} alt="Interior final layer" className="services-bg-image" />
-            </div>
-            <div className="services-reveal-glow" ref={servicesGlowRef} />
+            <img src="/modern-interior-services.jpg" alt="Modern minimalist interior background" className="services-bg-image" />
+            <div className="services-overlay-dark" />
           </div>
 
-          <div className="services-content" ref={servicesContentRef}>
+          <div className="services-content">
             <h3>Services Section</h3>
             <p className="section-sub">Clean, simple cards with included works for each service type.</p>
             <div className="services-grid" ref={servicesGridRef}>
@@ -415,6 +451,14 @@ function App() {
                       <li key={item}>{item}</li>
                     ))}
                   </ul>
+                  <a 
+                    href="https://wa.me/919947015742?text=Hi%20Standard%20Interiors%2C%20I%20am%20interested%20in%20your%20services."
+                    target="_blank"
+                    rel="noreferrer"
+                    className="service-card-cta"
+                  >
+                    Book Now
+                  </a>
                 </article>
               ))}
             </div>
@@ -443,7 +487,7 @@ function App() {
           </div>
         </motion.section>
 
-        <motion.section id="instagram" className="section instagram-section" {...revealInViewProps()}>
+        <section id="instagram" className="section instagram-section" ref={instagramSectionRef}>
           <div className="instagram-head">
             <h3>Our Works &amp; Reels</h3>
             <p className="section-sub">
@@ -475,26 +519,61 @@ function App() {
             </a>
           </div>
 
-          <div className="instagram-grid">
-            {instagramItems.map((item, idx) => (
-              <motion.a
-                key={item.title}
+          <div className="instagram-immersive-stage" aria-live="polite">
+            <div className="instagram-phone-zone">
+              <div className="phone-stand" aria-hidden="true">
+                <span className="stand-head" />
+                <span className="stand-arm" />
+                <span className="stand-joint" />
+                <span className="stand-base" />
+              </div>
+
+              <a
                 href="https://www.instagram.com/standard__interiors?igsh=Z2xuaHEyNDhldmQx"
                 target="_blank"
                 rel="noreferrer"
-                className="instagram-card"
-                initial={reduceMotion ? false : { opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.25 }}
-                transition={reduceMotion ? { duration: 0 } : { duration: 0.5, ease: revealEase, delay: idx * 0.08 }}
+                className="instagram-phone-mockup"
               >
-                <img src={item.image} alt={item.title} loading="lazy" />
-                <span className="instagram-card-overlay">
-                  <strong>{item.title}</strong>
-                  {item.kind === 'reel' && <em className="reel-play">▶</em>}
-                </span>
-              </motion.a>
-            ))}
+                <img
+                  src={phoneScreenSrc}
+                  alt="Standard Interiors Instagram profile"
+                  loading="lazy"
+                  className="instagram-phone-screen-image"
+                  onError={() => setPhoneScreenSrc(phoneReel.image)}
+                />
+              </a>
+
+              <span className="flow-arrow flow-arrow-a" aria-hidden="true" />
+              <span className="flow-arrow flow-arrow-b" aria-hidden="true" />
+
+              <div className="floating-reel-trail" aria-hidden="true">
+                {trailReels.map((item, idx) => (
+                  <span
+                    key={`${item.title}-trail`}
+                    className={`floating-trail-card trail-${idx + 1}`}
+                  >
+                    <img src={item.image} alt="" loading="lazy" />
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="instagram-preview-row" ref={instagramPreviewRowRef}>
+              {visibleReels.map((item) => (
+                <a
+                  key={`${item.title}-preview`}
+                  href="https://www.instagram.com/standard__interiors?igsh=Z2xuaHEyNDhldmQx"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="instagram-preview-card"
+                >
+                  <img src={item.image} alt={item.title} loading="lazy" />
+                  <span className="instagram-preview-overlay">
+                    <strong>{item.title}</strong>
+                  </span>
+                </a>
+              ))}
+            </div>
           </div>
 
           <a
@@ -505,7 +584,7 @@ function App() {
           >
             View More on Instagram
           </a>
-        </motion.section>
+        </section>
 
         <motion.section id="contact" className="section contact-section" {...revealInViewProps()}>
           <motion.div className="contact-left" {...revealInViewProps(0.02)}>
@@ -636,7 +715,7 @@ function App() {
               initial={reduceMotion ? false : { opacity: 0, y: 12, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 10, scale: 0.98 }}
-              transition={reduceMotion ? { duration: 0.05 } : { duration: 0.24, ease: revealEase }}
+              transition={reduceMotion ? { duration: 0.05 } : { duration: 0.24, ease: REVEAL_EASE }}
             >
               <button type="button" onClick={() => setLightboxItem(null)}>X</button>
               <img src={lightboxItem.image} alt={lightboxItem.title} />
