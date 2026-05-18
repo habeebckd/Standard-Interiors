@@ -21,6 +21,7 @@ import w6 from '../workPhotos/WhatsApp Image 2026-03-25 at 3.02.26 PM.jpeg';
 import w7 from '../workPhotos/WhatsApp Image 2026-03-25 at 3.02.27 PM.jpeg';
 import w8 from '../workPhotos/WhatsApp Image 2026-03-25 at 3.02.28 PM.jpeg';
 
+
 // Animation constants
 const REVEAL_EASE = [0.22, 1, 0.36, 1];
 const REVEAL_DURATION = 0.58;
@@ -81,6 +82,8 @@ const services = [
   }
 ];
 
+import ServicesSection from './components/ServicesSectionRedesigned';
+
 const instagramItems = [
   { image: w1, title: 'Premium Lounge Setup' },
   { image: w2, title: 'Statement Ceiling Concept' },
@@ -112,6 +115,8 @@ function App() {
   const servicesRef = useRef(null);
   const servicesBgRef = useRef(null);
   const servicesGridRef = useRef(null);
+  const servicesRealRef = useRef(null);
+  const servicesWireRef = useRef(null);
   const instagramSectionRef = useRef(null);
   const instagramPreviewRowRef = useRef(null);
 
@@ -428,42 +433,13 @@ function App() {
           </div>
         </motion.section>
 
-        <section id="services" className="section services-section" ref={servicesRef}>
-          <div
-            className="blueprint-bg"
-            aria-hidden="true"
-            ref={servicesBgRef}
-          >
-            <img src="/modern-interior-services.jpg" alt="Modern minimalist interior background" className="services-bg-image" />
-            <div className="services-overlay-dark" />
-          </div>
-
-          <div className="services-content">
-            <h3>Services Section</h3>
-            <p className="section-sub">Clean, simple cards with included works for each service type.</p>
-            <div className="services-grid" ref={servicesGridRef}>
-              {services.map((service) => (
-                <article className="service-card" key={service.title}>
-                  <h4>{service.title}</h4>
-                  <p>Includes:</p>
-                  <ul>
-                    {service.includes.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                  <a 
-                    href="https://wa.me/919947015742?text=Hi%20Standard%20Interiors%2C%20I%20am%20interested%20in%20your%20services."
-                    target="_blank"
-                    rel="noreferrer"
-                    className="service-card-cta"
-                  >
-                    Book Now
-                  </a>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
+        <ServicesSection
+          servicesRef={servicesRef}
+          servicesBgRef={servicesBgRef}
+          servicesGridRef={servicesGridRef}
+          servicesRealRef={servicesRealRef}
+          servicesWireRef={servicesWireRef}
+        />
 
         <motion.section id="portfolio" className="section" {...revealInViewProps()}>
           <h3>Portfolio</h3>
