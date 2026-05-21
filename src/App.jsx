@@ -495,6 +495,15 @@ function App() {
             </a>
           </div>
 
+          <div className="instagram-mobile-image" aria-hidden="true">
+            <span className="instagram-mobile-sensor" />
+            <img
+              src="/instagramPage(mobile).png"
+              alt="Standard Interiors Instagram mobile preview"
+              loading="lazy"
+            />
+          </div>
+
           <div className="instagram-immersive-stage" aria-live="polite">
             <div className="instagram-phone-zone">
               <div className="phone-stand" aria-hidden="true">

@@ -1051,6 +1051,25 @@ a {
   align-items: center;
 }
 
+.instagram-mobile-image {
+  display: none;
+  margin-top: 16px;
+  border-radius: 24px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 24px 46px rgba(45, 21, 33, 0.14);
+}
+
+.instagram-mobile-image img {
+  width: 100%;
+  display: block;
+  height: auto;
+}
+
+.instagram-mobile-sensor {
+  display: none;
+}
+
 .instagram-meta {
   display: flex;
   gap: 12px;
@@ -1948,58 +1967,41 @@ main {
   }
 
   .instagram-immersive-stage {
+    display: none;
+  }
+
+  .instagram-mobile-image {
+    display: block;
     border-radius: 20px;
-    padding: 12px;
   }
 
-  .instagram-phone-zone {
-    min-height: 220px;
+  .instagram-mobile-sensor {
+    display: block;
+    position: absolute;
+    top: 33px;
+    left: calc(50% + 24px);
+    width: 2px;
+    height: 2px;
+    border-radius: 50%;
+    transform: translateX(-50%);
+    background: radial-gradient(circle, rgba(210, 242, 255, 1) 0 0.5px, rgba(132, 201, 255, 0.92) 45%, rgba(18, 28, 44, 0.08) 100%);
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.05),
+      0 0 4px rgba(127, 198, 255, 0.12);
+    opacity: 0.72;
+    pointer-events: none;
+    z-index: 2;
+    animation: mobileSensorPulse 5.5s steps(1, end) infinite;
   }
 
-  .phone-stand {
-    width: 160px;
-    height: 206px;
-    left: 4px;
-    bottom: 6px;
-  }
-
-  .stand-head {
-    left: 56px;
-    top: 40px;
-    width: 34px;
-    height: 46px;
-  }
-
-  .stand-arm {
-    left: 42px;
-    top: 74px;
-    width: 26px;
-    height: 88px;
-  }
-
-  .stand-joint {
-    left: 24px;
-    top: 118px;
-    width: 40px;
-    height: 40px;
-  }
-
-  .stand-base {
-    width: 112px;
-    height: 34px;
-  }
-
-  .instagram-phone-mockup {
-    width: min(190px, 64%);
-    transform: rotate(-9deg);
-  }
-
-  .floating-reel-trail {
-    display: none;
-  }
-
-  .flow-arrow {
-    display: none;
+  .instagram-mobile-sensor::before {
+    content: '';
+    position: absolute;
+    inset: -5px;
+    border-radius: inherit;
+    background: radial-gradient(circle, rgba(141, 214, 255, 0.1), rgba(141, 214, 255, 0) 72%);
+    filter: blur(0.5px);
+    animation: mobileSensorGlow 5.5s steps(1, end) infinite;
   }
 
   .instagram-preview-row {
@@ -2088,6 +2090,28 @@ main {
     padding: 58px 0 34px;
   }
 
+
+@keyframes mobileSensorPulse {
+  0%, 44%, 100% {
+    transform: translateX(-50%) scale(0.92);
+    opacity: 0.18;
+  }
+  45%, 55% {
+    transform: translateX(-50%) scale(1.18);
+    opacity: 0.98;
+  }
+}
+
+@keyframes mobileSensorGlow {
+  0%, 44%, 100% {
+    opacity: 0.06;
+    transform: scale(0.9);
+  }
+  45%, 55% {
+    opacity: 0.9;
+    transform: scale(1.1);
+  }
+}
   .blueprint-bg {
     opacity: 1;
   }
