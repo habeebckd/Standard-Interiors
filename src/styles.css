@@ -1892,6 +1892,15 @@ main {
 }
 
 @media (max-width: 640px) {
+  #portfolio {
+    display: none;
+  }
+
+  .desktop-nav a[href="#portfolio"],
+  .mobile-menu a[href="#portfolio"] {
+    display: none;
+  }
+
   .hero {
     min-height: auto;
     padding-top: 128px;
