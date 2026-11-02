@@ -1,0 +1,26 @@
+<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <rect width="256" height="256" fill="#1a1a1a"/>
+  <circle cx="128" cy="128" r="120" fill="none" stroke="#d4af37" stroke-width="2"/>
+  
+  <!-- Hexagon with SI icon - larger and more visible -->
+  <g transform="translate(128, 128)">
+    <!-- Hexagon shape with gold fill -->
+    <polygon points="0,-60 52,-30 52,30 0,60 -52,30 -52,-30" 
+             fill="none" stroke="#d4af37" stroke-width="4" stroke-linejoin="round"/>
+    
+    <!-- Inner decorative hexagon -->
+    <polygon points="0,-45 39,-22 39,22 0,45 -39,22 -39,-22" 
+             fill="none" stroke="#d4af37" stroke-width="2" opacity="0.7"/>
+    
+    <!-- Letter S (curved) -->
+    <g transform="translate(-15, -5)">
+      <path d="M 0,-12 Q 8,-12 8,-8 Q 8,-4 0,-4 Q -8,-4 -8,0 Q -8,4 0,4 Q 8,4 8,8 Q 8,12 0,12 Q -8,12 -8,8" 
+            fill="none" stroke="#d4af37" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    
+    <!-- Letter I (straight line) -->
+    <line x1="15" y1="-12" x2="15" y2="12" stroke="#d4af37" stroke-width="3" stroke-linecap="round"/>
+  </g>
+</svg>
+
