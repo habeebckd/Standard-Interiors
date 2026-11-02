@@ -1,0 +1,21 @@
+{
+  "name": "Standard Interiors",
+  "short_name": "Standard Interiors",
+  "description": "Budget-Friendly Interior Design, Gypsum Ceilings, Lighting & Home Decor in Kerala",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#efefe2",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

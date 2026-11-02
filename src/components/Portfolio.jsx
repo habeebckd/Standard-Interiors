@@ -5,7 +5,7 @@ const REVEAL_EASE = [0.22, 1, 0.36, 1];
 const REVEAL_DURATION = 0.58;
 
 const Portfolio = memo(({ portfolioItems, onSelectItem, reduceMotion }) => {
-  const items = useMemo(() => portfolioItems, [portfolioItems]);
+  const items = useMemo(() => portfolioItems || [], [portfolioItems]);
 
   const revealVariants = {
     hidden: { opacity: 0, y: 18 },
@@ -29,7 +29,7 @@ const Portfolio = memo(({ portfolioItems, onSelectItem, reduceMotion }) => {
 
   return (
     <motion.section id="portfolio" className="section" {...revealInViewProps()}>
-      <h3>Portfolio</h3>
+      <h2>Portfolio</h2>
       <p className="section-sub">Recent interior highlights built around warmth, lighting, and clean ceiling details.</p>
       <div className="portfolio-grid">
         {items.map((item, idx) => (
@@ -40,7 +40,7 @@ const Portfolio = memo(({ portfolioItems, onSelectItem, reduceMotion }) => {
             type="button"
             {...revealInViewProps(idx * 0.03)}
           >
-            <img src={item.image} alt={item.title} loading="lazy" />
+            <img src={item.image} alt={`${item.title} - Standard Interiors Kerala`} loading="lazy" />
             <span>
               <strong>{item.title}</strong>
               <small>{item.text}</small>

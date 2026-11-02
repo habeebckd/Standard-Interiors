@@ -27,10 +27,10 @@ const Hero = memo(({ reduceMotion }) => {
 
   return (
     <motion.section id="home" className="hero" {...revealInViewProps()}>
-      <h2>
+      <h1>
         Build Interiors
         <span>That Speak for You</span>
-      </h2>
+      </h1>
       <p>
         From personal homes to business spaces, Standard Interiors crafts beautiful,
         budget-friendly interior solutions that bring your vision to life.

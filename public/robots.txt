@@ -1,0 +1,7 @@
+# robots.txt for Standard Interiors
+User-agent: *
+Allow: /
+
+# Sitemap URL
+Sitemap: https://standard-interiors.vercel.app/sitemap.xml
+

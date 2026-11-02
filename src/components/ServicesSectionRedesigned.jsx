@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useState } from 'react';
+import React, { memo, useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { SERVICES_ENHANCED } from '../data/servicesData';
 import ServiceModal from './ServiceModal';
@@ -58,37 +58,26 @@ const ICON_MAP = {
 const ServiceCard = memo(({ service, index, onClick }) => {
   // Use a semantic button for accessibility and keyboard support
   return (
-    <motion.button
+    <button
       type="button"
       aria-haspopup="dialog"
       aria-label={`Open details for ${service.title}`}
-      custom={index}
-      initial={{ opacity: 0, y: 25 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.15 }}
-      transition={{
-        duration: 0.4,
-        ease: [0.22, 1, 0.36, 1],
-        delay: index * 0.08
-      }}
       className="service-card-design service-card"
       onClick={() => onClick(service)}
     >
       {/* Icon Circle */}
-      <motion.div
+      <div
         className="service-icon-glow"
-        whileHover={{ scale: 1.06 }}
-        transition={{ duration: 0.22 }}
       >
         <span className="service-icon">{ICON_MAP[service.id]}</span>
-      </motion.div>
+      </div>
 
       {/* Card Content */}
       <div className="service-card-content">
         <h3 className="service-card-title">{service.title}</h3>
         <p className="service-card-desc">{service.description}</p>
       </div>
-    </motion.button>
+    </button>
   );
 });
 
@@ -100,6 +89,13 @@ const ServicesSection = memo(({ services = SERVICES_ENHANCED, servicesRef, servi
   
   const [selectedService, setSelectedService] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    servicesData.forEach((service) => {
+      const image = new Image();
+      image.src = service.image;
+    });
+  }, [servicesData]);
 
   const handleCardClick = (service) => {
     setSelectedService(service);

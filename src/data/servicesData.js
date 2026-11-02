@@ -6,7 +6,7 @@ export const SERVICES_ENHANCED = [
     title: 'Bride & Groom Room',
     description: 'Elegant bedroom interiors designed for comfort and luxury.',
     image: '/Bride & Groom Room.png',
-    includes: ['Ceiling Design & Installation', 'Premium Wiring Work', 'Gypsum Finishing', 'Ambient Lighting Design', 'Premium Paint Work', 'Curtain Installation'],
+    includes: ['Ceiling Design & Installation', 'Premium Wiring Work', 'Gypsum Finishing', 'Ambient Lighting Design', 'Premium Paint Work', 'Curtain Installation', 'Furniture'],
     features: ['Customizable design', 'Premium materials', 'Expert craftsmanship', 'Quick turnaround']
   },
   {
@@ -15,7 +15,7 @@ export const SERVICES_ENHANCED = [
     title: 'Complete Room Interior',
     description: 'End-to-end interior work from concept to completion.',
     image: '/Complete Room Interior.png',
-    includes: ['Ceiling Design & Installation', 'Complete Wiring System', 'Wall Preparation', 'Professional Painting', 'Lighting Integration', 'Quality Finishing'],
+    includes: ['Ceiling Design & Installation', 'Complete Wiring System', 'Wall Preparation', 'Professional Painting', 'Lighting Integration', 'Quality Finishing', 'Furniture'],
     features: ['Full customization', 'Premium quality', 'On-time delivery', 'Warranty included']
   },
   {

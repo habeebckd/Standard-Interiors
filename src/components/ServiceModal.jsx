@@ -1,9 +1,21 @@
-import React, { memo } from 'react';
+import React, { memo, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const REVEAL_EASE = [0.22, 1, 0.36, 1];
 
 const ServiceModal = memo(({ service, isOpen, onClose, onBookNow, reduceMotion }) => {
+  useEffect(() => {
+    if (!isOpen) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen]);
+
   const backdropVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1 },
@@ -21,7 +33,7 @@ const ServiceModal = memo(({ service, isOpen, onClose, onBookNow, reduceMotion }
       scale: 1,
       y: 0,
       transition: { 
-        duration: 0.35, 
+        duration: 0.22, 
         ease: REVEAL_EASE 
       }
     },
@@ -30,12 +42,12 @@ const ServiceModal = memo(({ service, isOpen, onClose, onBookNow, reduceMotion }
       scale: 0.95,
       y: 20,
       transition: { 
-        duration: 0.2 
+        duration: 0.16 
       }
     }
   };
 
-  return (
+  const modalNode = (
     <AnimatePresence>
       {isOpen && service && (
         <>
@@ -51,20 +63,20 @@ const ServiceModal = memo(({ service, isOpen, onClose, onBookNow, reduceMotion }
           />
 
           {/* Modal */}
-          <motion.div
-            className="modal-overlay-crystal"
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            variants={modalVariants}
-          >
-            <div className="modal-crystal">
+            <motion.div
+              className="modal-overlay-crystal"
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              variants={modalVariants}
+            >
+              <div className="modal-crystal" style={{ transform: 'translateZ(0)' }}>
               {/* Close Button */}
               <motion.button
                 className="modal-close-crystal"
                 onClick={onClose}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={reduceMotion ? undefined : { scale: 1.08 }}
+                whileTap={reduceMotion ? undefined : { scale: 0.96 }}
               >
                 ✕
               </motion.button>
@@ -72,12 +84,12 @@ const ServiceModal = memo(({ service, isOpen, onClose, onBookNow, reduceMotion }
               {/* Modal Content */}
               <div className="modal-content-crystal">
                 {/* Image Section with Button */}
-                <motion.div
-                  className="modal-image-section-crystal"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1, duration: 0.3 }}
-                >
+                  <motion.div
+                    className="modal-image-section-crystal"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.08, duration: 0.22 }}
+                  >
                   <div
                     className="modal-image-wrapper-crystal"
                   >
@@ -85,6 +97,8 @@ const ServiceModal = memo(({ service, isOpen, onClose, onBookNow, reduceMotion }
                       src={service.image}
                       alt={service.title}
                       className="modal-image-crystal"
+                      loading="eager"
+                      decoding="async"
                     />
                   </div>
                   
@@ -95,11 +109,11 @@ const ServiceModal = memo(({ service, isOpen, onClose, onBookNow, reduceMotion }
                       onBookNow();
                       onClose();
                     }}
-                    whileHover={{ y: -4 }}
-                    whileTap={{ scale: 0.95 }}
+                    whileHover={reduceMotion ? undefined : { y: -2 }}
+                    whileTap={reduceMotion ? undefined : { scale: 0.98 }}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2, duration: 0.3 }}
+                    transition={{ delay: 0.12, duration: 0.22 }}
                   >
                     Book Now
                   </motion.button>
@@ -110,7 +124,7 @@ const ServiceModal = memo(({ service, isOpen, onClose, onBookNow, reduceMotion }
                   className="modal-text-crystal"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.15, duration: 0.3 }}
+                  transition={{ delay: 0.1, duration: 0.22 }}
                 >
                   {/* Header */}
                   <div className="modal-header-crystal">
@@ -127,17 +141,11 @@ const ServiceModal = memo(({ service, isOpen, onClose, onBookNow, reduceMotion }
                   <div className="modal-includes-crystal">
                     <h3 className="modal-section-title-crystal">What's Included</h3>
                     <ul className="modal-list-crystal">
-                      {service.includes.map((item, idx) => (
-                        <motion.li
-                          key={item}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.2 + idx * 0.05, duration: 0.2 }}
-                          className="modal-list-item-crystal"
-                        >
+                      {service.includes.map((item) => (
+                        <li key={item} className="modal-list-item-crystal">
                           <span className="modal-check-crystal">✓</span>
                           {item}
-                        </motion.li>
+                        </li>
                       ))}
                     </ul>
                   </div>
@@ -146,16 +154,10 @@ const ServiceModal = memo(({ service, isOpen, onClose, onBookNow, reduceMotion }
                   <div className="modal-features-crystal">
                     <h3 className="modal-section-title-crystal">Key Features</h3>
                     <div className="modal-features-grid-crystal">
-                      {service.features.map((feature, idx) => (
-                        <motion.div
-                          key={feature}
-                          className="modal-feature-badge-crystal"
-                          initial={{ opacity: 0, scale: 0.9 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ delay: 0.25 + idx * 0.05, duration: 0.2 }}
-                        >
+                      {service.features.map((feature) => (
+                        <div key={feature} className="modal-feature-badge-crystal">
                           {feature}
-                        </motion.div>
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -167,6 +169,12 @@ const ServiceModal = memo(({ service, isOpen, onClose, onBookNow, reduceMotion }
       )}
     </AnimatePresence>
   );
+
+  if (typeof document === 'undefined') {
+    return modalNode;
+  }
+
+  return createPortal(modalNode, document.body);
 });
 
 ServiceModal.displayName = 'ServiceModal';

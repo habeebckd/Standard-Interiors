@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import { motion } from 'framer-motion';
-import logo from '../../assets/logo/standard-interiors-logo.png';
+const logo = '/standard interiors Logo.png';
 import heroImg from '../../assets/images/project-1.jpeg'; // use project-1 or similar as the hero image
 
 const REVEAL_EASE = [0.22, 1, 0.36, 1];
@@ -259,7 +259,7 @@ const HeroRedesigned = memo(({ reduceMotion }) => {
       <motion.section id="home" className="hero-v2-container" {...revealInViewProps()}>
         <div className="hero-v2-header-row">
           <div className="hero-v2-logo-wrap">
-            <img src={logo} alt="Logo" className="hero-v2-logo" />
+            <img src={logo} alt="Standard Interiors Logo" className="hero-v2-logo" />
             <div className="hero-v2-logo-text">STANDARD<br/>INTERIORS</div>
           </div>
           <div className="hero-v2-socials">
@@ -325,7 +325,7 @@ const HeroRedesigned = memo(({ reduceMotion }) => {
         </div>
 
         <div className="hero-v2-right">
-          <img src={heroImg} alt="Interior Design" className="hero-v2-right-img" />
+          <img src={heroImg} alt="Modern Living Room Gypsum Ceiling and Interior Design by Standard Interiors" className="hero-v2-right-img" />
         </div>
       </motion.section>
     </>

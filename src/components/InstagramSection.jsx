@@ -1,102 +1,18 @@
-import React, { memo, useRef, useEffect, useCallback, useMemo } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import React, { memo } from 'react';
 
-gsap.registerPlugin(ScrollTrigger);
-
-const InstagramSection = memo(({ instagramItems, reduceMotion }) => {
-  const instagramSectionRef = useRef(null);
-  const instagramPreviewRowRef = useRef(null);
-
-  const phoneReel = useMemo(() => ({ image: instagramItems[5], title: 'Bedroom Transformation' }), [instagramItems]);
-  const trailReels = useMemo(() => [instagramItems[1], instagramItems[2], instagramItems[3]], [instagramItems]);
-  const visibleReels = useMemo(() => [instagramItems[1], instagramItems[2], instagramItems[3], instagramItems[4], instagramItems[5]], [instagramItems]);
-
-  const [phoneScreenSrc, setPhoneScreenSrc] = React.useState('/WhatsApp Image 2026-04-21 at 3.33.11 PM.jpeg');
-
-  const updateCarouselPosition = useCallback(() => {
-    const row = instagramPreviewRowRef.current;
-    if (!row) return;
-
-    const cards = gsap.utils.toArray('.instagram-preview-card', row);
-    const rowBounds = row.getBoundingClientRect();
-    const rowCenter = rowBounds.left + rowBounds.width * 0.5;
-    
-    let closestDistance = Infinity;
-    const cardPositions = [];
-
-    cards.forEach((card, idx) => {
-      const bounds = card.getBoundingClientRect();
-      const cardCenter = bounds.left + bounds.width * 0.5;
-      const distance = Math.abs(cardCenter - rowCenter);
-      
-      cardPositions.push({ card, index: idx, distance, center: cardCenter });
-      closestDistance = Math.min(closestDistance, distance);
-    });
-
-    cardPositions.sort((a, b) => a.distance - b.distance);
-
-    cards.forEach(card => {
-      card.classList.remove('is-center', 'is-left-1', 'is-left-2', 'is-right-1', 'is-right-2');
-    });
-
-    cardPositions.forEach((pos, sortedIdx) => {
-      if (sortedIdx === 0) {
-        pos.card.classList.add('is-center');
-      } else if (pos.center < rowCenter) {
-        if (sortedIdx === 1) pos.card.classList.add('is-left-1');
-        else if (sortedIdx === 2) pos.card.classList.add('is-left-2');
-      } else {
-        if (sortedIdx === 1) pos.card.classList.add('is-right-1');
-        else if (sortedIdx === 2) pos.card.classList.add('is-right-2');
-      }
-    });
-  }, []);
-
-  const updateRowMotionBlur = useCallback((velocity) => {
-    const row = instagramPreviewRowRef.current;
-    if (!row) return;
-    const magnitude = Math.abs(velocity);
-    const blur = magnitude < 28 ? 0 : Math.min(magnitude / 3200, 0.8);
-    row.style.setProperty('--row-motion-blur', `${blur.toFixed(3)}px`);
-  }, []);
-
-  useEffect(() => {
-    if (reduceMotion) return;
-
-    const mm = gsap.matchMedia();
-
-    mm.add('(min-width: 769px)', () => {
-      gsap.fromTo(
-        instagramPreviewRowRef.current,
-        { xPercent: -9 },
-        {
-          xPercent: 12,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: instagramSectionRef.current,
-            start: 'top bottom',
-            end: 'bottom top',
-            scrub: 1.45,
-            onUpdate: (self) => {
-              updateCarouselPosition();
-              updateRowMotionBlur(self.getVelocity());
-            },
-            onRefresh: () => updateCarouselPosition()
-          }
-        }
-      );
-
-      gsap.delayedCall(0.08, updateCarouselPosition);
-    });
-
-    return () => mm.revert();
-  }, [reduceMotion, updateCarouselPosition, updateRowMotionBlur]);
-
+const InstagramSection = memo(({
+  instagramSectionRef,
+  instagramPreviewRowRef,
+  phoneScreenSrc,
+  setPhoneScreenSrc,
+  phoneReel,
+  trailReels,
+  visibleReels
+}) => {
   return (
     <section id="instagram" className="section instagram-section" ref={instagramSectionRef}>
       <div className="instagram-head">
-        <h3>Our Works &amp; Reels</h3>
+        <h2>Our Works &amp; Reels</h2>
         <p className="section-sub">
           Explore our latest interior designs, projects, and transformations on Instagram.
         </p>
@@ -124,6 +40,23 @@ const InstagramSection = memo(({ instagramItems, reduceMotion }) => {
         >
           Follow Us
         </a>
+      </div>
+
+      <div className="instagram-tablet-image" aria-hidden="true">
+        <img
+          src="/instagramPag.png"
+          alt="Standard Interiors Instagram tablet preview"
+          loading="lazy"
+        />
+      </div>
+
+      <div className="instagram-mobile-image" aria-hidden="true">
+        <span className="instagram-mobile-sensor" />
+        <img
+          src="/instagramPage(mobile).png"
+          alt="Standard Interiors Instagram mobile preview"
+          loading="lazy"
+        />
       </div>
 
       <div className="instagram-immersive-stage" aria-live="polite">
@@ -174,7 +107,7 @@ const InstagramSection = memo(({ instagramItems, reduceMotion }) => {
               rel="noreferrer"
               className="instagram-preview-card"
             >
-              <img src={item.image} alt={item.title} loading="lazy" />
+              <img src={item.image} alt={`${item.title} - Standard Interiors Kerala`} loading="lazy" />
               <span className="instagram-preview-overlay">
                 <strong>{item.title}</strong>
               </span>

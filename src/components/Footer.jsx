@@ -45,7 +45,9 @@ const Footer = memo(({ logo, partnersHighlights, reduceMotion }) => {
       <motion.footer className="site-footer" {...revealInViewProps()}>
         <div className="footer-top-row">
           <div>
-            <img src={logo} alt="Standard Interiors logo" className="footer-logo" />
+            <div className="footer-logo-badge">
+              <img src={logo} alt="Standard Interiors logo" className="footer-logo" />
+            </div>
             <p className="footer-about">
               Interior solutions built for everyone. From personal spaces to complete room and shop interiors.
             </p>

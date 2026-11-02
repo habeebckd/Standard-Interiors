@@ -1,9 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, lazy, Suspense } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-import logo from '../assets/logo/standard-interiors-logo.png';
+const logo = '/standard interiors Logo.png';
+const PremiumSplash = lazy(() => import('./components/PremiumSplash'));
 import p1 from '../assets/images/project-1.jpeg';
 import p2 from '../assets/images/project-2.jpeg';
 import p3 from '../assets/images/project-3.jpeg';
@@ -26,6 +27,8 @@ import w8 from '../workPhotos/WhatsApp Image 2026-03-25 at 3.02.28 PM.jpeg';
 const REVEAL_EASE = [0.22, 1, 0.36, 1];
 const REVEAL_DURATION = 0.58;
 const FADE_DURATION = 0.4;
+const SPLASH_DURATION = 2200;
+const splashLogoSrc = logo;
 
 const revealVariants = {
   hidden: { opacity: 0, y: 18 },
@@ -43,6 +46,56 @@ const fadeVariants = {
     transition: { duration: FADE_DURATION, ease: REVEAL_EASE }
   }
 };
+
+function SplashLoadFallback({ onDone = null, reduceMotion = false }) {
+  const handleDismiss = () => {
+    if (onDone) onDone();
+  };
+
+  return (
+    <div className="premium-splash" aria-hidden="true">
+      <div className="splash-scene">
+        <span className="splash-orb splash-orb--left" />
+        <span className="splash-orb splash-orb--right" />
+        <span className="splash-backlight" />
+
+        <div className="splash-logo-wrap">
+          <span className="splash-logo-pulse" />
+          <img src={splashLogoSrc} alt="" className="splash-logo" />
+          <span className="splash-logo-reflection" />
+        </div>
+
+        <span
+          className={`splash-dismiss-trigger splash-dismiss-trigger--fallback${reduceMotion ? ' is-reduced' : ''}`}
+          onAnimationEnd={handleDismiss}
+          aria-hidden="true"
+        />
+      </div>
+    </div>
+  );
+}
+
+class SplashBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error) {
+    if (this.props.onError) this.props.onError(error);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback || null;
+    }
+    return this.props.children;
+  }
+}
 
 // Data constants
 const portfolioItems = [
@@ -82,7 +135,11 @@ const services = [
   }
 ];
 
+import Hero from './components/Hero';
 import ServicesSection from './components/ServicesSectionRedesigned';
+import Portfolio from './components/Portfolio';
+import InstagramSection from './components/InstagramSection';
+import ContactSection from './components/ContactSection';
 
 const instagramItems = [
   { image: w1, title: 'Premium Lounge Setup' },
@@ -103,6 +160,7 @@ const partnersHighlights = [
 ];
 
 function App() {
+  const [showSplash, setShowSplash] = useState(true);
   const [scrolled, setScrolled] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -111,6 +169,7 @@ function App() {
   const [formMessage, setFormMessage] = useState(null);
   const [phoneScreenSrc, setPhoneScreenSrc] = useState('/WhatsApp Image 2026-04-21 at 3.33.11 PM.jpeg');
   const reduceMotion = useReducedMotion();
+  const [lowPerf, setLowPerf] = useState(false);
   const lastScrollYRef = useRef(0);
   const servicesRef = useRef(null);
   const servicesBgRef = useRef(null);
@@ -119,6 +178,44 @@ function App() {
   const servicesWireRef = useRef(null);
   const instagramSectionRef = useRef(null);
   const instagramPreviewRowRef = useRef(null);
+
+  useEffect(() => {
+    const splashTimer = window.setTimeout(() => {
+      setShowSplash(false);
+    }, reduceMotion ? 900 : SPLASH_DURATION);
+
+    return () => window.clearTimeout(splashTimer);
+  }, [reduceMotion]);
+
+  // Prefetch the PremiumSplash chunk early to avoid loading delay on first render
+  useEffect(() => {
+    let cancelled = false;
+    if (!cancelled) {
+      import('./components/PremiumSplash').catch(() => {});
+    }
+    return () => { cancelled = true; };
+  }, []);
+
+  // detect low-performance devices (simple heuristic)
+  useEffect(() => {
+    try {
+      const mem = navigator.deviceMemory || 4;
+      const hc = navigator.hardwareConcurrency || 4;
+      const isMobile = /Mobi|Android/i.test(navigator.userAgent || '') || window.innerWidth < 900;
+      const low = mem <= 2 || hc <= 2 || isMobile;
+      setLowPerf(!!low);
+    } catch (e) {
+      setLowPerf(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    document.body.classList.toggle('splash-active', showSplash);
+
+    return () => {
+      document.body.classList.remove('splash-active');
+    };
+  }, [showSplash]);
 
   useEffect(() => {
     const onKeyDown = (event) => {
@@ -134,31 +231,24 @@ function App() {
   }, []);
 
   useEffect(() => {
-    let ticking = false;
     const SCROLL_THRESHOLD = 3;
     const NAVBAR_SCROLL_POINT = 90;
 
     const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
+      const y = window.scrollY;
 
-      window.requestAnimationFrame(() => {
-        const y = window.scrollY;
-        const delta = y - lastScrollYRef.current;
+      if (y < NAVBAR_SCROLL_POINT) {
+        setExpanded(false);
+        setScrolled(false);
+      } else {
+        setScrolled(true);
 
-        if (y < NAVBAR_SCROLL_POINT) {
+        if (Math.abs(y - lastScrollYRef.current) > SCROLL_THRESHOLD) {
           setExpanded(false);
-          setScrolled(false);
-        } else if (delta > SCROLL_THRESHOLD) {
-          setScrolled(true);
-        } else if (delta < -SCROLL_THRESHOLD) {
-          setExpanded(false);
-          setScrolled(false);
         }
+      }
 
-        lastScrollYRef.current = y;
-        ticking = false;
-      });
+      lastScrollYRef.current = y;
     };
 
     lastScrollYRef.current = window.scrollY;
@@ -369,13 +459,53 @@ function App() {
 
   return (
     <div className="app">
+      <AnimatePresence mode="wait">
+        {showSplash && (
+          <motion.div
+            key="splash-shell"
+            className="premium-splash-shell"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 0.34, ease: REVEAL_EASE } }}
+          >
+            <SplashBoundary
+              fallback={(
+                <SplashLoadFallback
+                  reduceMotion={reduceMotion}
+                  onDone={() => setShowSplash(false)}
+                />
+              )}
+            >
+              <Suspense fallback={(
+                <SplashLoadFallback
+                  reduceMotion={reduceMotion}
+                  onDone={() => setShowSplash(false)}
+                />
+              )}>
+                <PremiumSplash
+                  reduceMotion={reduceMotion}
+                  lowPerf={lowPerf}
+                  onFinish={() => setShowSplash(false)}
+                />
+              </Suspense>
+            </SplashBoundary>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <motion.div
+        className="site-content"
+        initial={false}
+        animate={showSplash ? { opacity: 0, y: 18, scale: 0.988, filter: 'blur(10px)' } : { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+        transition={{ duration: showSplash ? 0.2 : 0.85, ease: REVEAL_EASE }}
+      >
       <header className="header-wrap">
         <div className={navClass}>
           <a href="#home" className="brand">
             <img src={logo} alt="Standard Interiors logo" />
             <div>
               <p>STANDARD</p>
-              <h1>Interiors</h1>
+              <span className="brand-title">Interiors</span>
             </div>
           </a>
 
@@ -418,20 +548,7 @@ function App() {
       </header>
 
       <main>
-        <motion.section id="home" className="hero" {...revealInViewProps()}>
-          <h2>
-            Build Interiors
-            <span>That Speak for You</span>
-          </h2>
-          <p>
-            From personal homes to business spaces, Standard Interiors crafts beautiful,
-            budget-friendly interior solutions that bring your vision to life.
-          </p>
-          <div className="hero-actions">
-            <a href="#contact" className="btn-dark">Get a Free Quote</a>
-            <a href="#services" className="btn-outline">Explore Services</a>
-          </div>
-        </motion.section>
+        <Hero reduceMotion={reduceMotion} />
 
         <ServicesSection
           servicesRef={servicesRef}
@@ -441,172 +558,29 @@ function App() {
           servicesWireRef={servicesWireRef}
         />
 
-        <motion.section id="portfolio" className="section" {...revealInViewProps()}>
-          <h3>Portfolio</h3>
-          <p className="section-sub">Recent interior highlights built around warmth, lighting, and clean ceiling details.</p>
-          <div className="portfolio-grid">
-            {portfolioItems.map((item, idx) => (
-              <motion.button
-                key={item.title}
-                className="portfolio-card"
-                onClick={() => setLightboxItem(item)}
-                type="button"
-                {...revealInViewProps(idx * 0.03)}
-              >
-                <img src={item.image} alt={item.title} loading="lazy" />
-                <span>
-                  <strong>{item.title}</strong>
-                  <small>{item.text}</small>
-                </span>
-              </motion.button>
-            ))}
-          </div>
-        </motion.section>
+        <Portfolio
+          portfolioItems={portfolioItems}
+          onSelectItem={setLightboxItem}
+          reduceMotion={reduceMotion}
+        />
 
-        <section id="instagram" className="section instagram-section" ref={instagramSectionRef}>
-          <div className="instagram-head">
-            <h3>Our Works &amp; Reels</h3>
-            <p className="section-sub">
-              Explore our latest interior designs, projects, and transformations on Instagram.
-            </p>
-          </div>
+        <InstagramSection
+          instagramSectionRef={instagramSectionRef}
+          instagramPreviewRowRef={instagramPreviewRowRef}
+          phoneScreenSrc={phoneScreenSrc}
+          setPhoneScreenSrc={setPhoneScreenSrc}
+          phoneReel={phoneReel}
+          trailReels={trailReels}
+          visibleReels={visibleReels}
+        />
 
-          <div className="instagram-profile-card">
-            <div className="instagram-meta">
-              <span className="instagram-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" strokeWidth="1.9" />
-                  <circle cx="12" cy="12" r="4.1" stroke="currentColor" strokeWidth="1.9" />
-                  <circle cx="17.2" cy="6.9" r="1.1" fill="currentColor" />
-                </svg>
-              </span>
-              <div>
-                <strong>standard__interiors</strong>
-                <p>Interior projects, reels, and before/after transformations.</p>
-              </div>
-            </div>
-            <a
-              href="https://www.instagram.com/standard__interiors?igsh=Z2xuaHEyNDhldmQx"
-              target="_blank"
-              rel="noreferrer"
-              className="instagram-follow-btn"
-            >
-              Follow Us
-            </a>
-          </div>
-
-          <div className="instagram-mobile-image" aria-hidden="true">
-            <span className="instagram-mobile-sensor" />
-            <img
-              src="/instagramPage(mobile).png"
-              alt="Standard Interiors Instagram mobile preview"
-              loading="lazy"
-            />
-          </div>
-
-          <div className="instagram-immersive-stage" aria-live="polite">
-            <div className="instagram-phone-zone">
-              <div className="phone-stand" aria-hidden="true">
-                <span className="stand-head" />
-                <span className="stand-arm" />
-                <span className="stand-joint" />
-                <span className="stand-base" />
-              </div>
-
-              <a
-                href="https://www.instagram.com/standard__interiors?igsh=Z2xuaHEyNDhldmQx"
-                target="_blank"
-                rel="noreferrer"
-                className="instagram-phone-mockup"
-              >
-                <img
-                  src={phoneScreenSrc}
-                  alt="Standard Interiors Instagram profile"
-                  loading="lazy"
-                  className="instagram-phone-screen-image"
-                  onError={() => setPhoneScreenSrc(phoneReel.image)}
-                />
-              </a>
-
-              <span className="flow-arrow flow-arrow-a" aria-hidden="true" />
-              <span className="flow-arrow flow-arrow-b" aria-hidden="true" />
-
-              <div className="floating-reel-trail" aria-hidden="true">
-                {trailReels.map((item, idx) => (
-                  <span
-                    key={`${item.title}-trail`}
-                    className={`floating-trail-card trail-${idx + 1}`}
-                  >
-                    <img src={item.image} alt="" loading="lazy" />
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div className="instagram-preview-row" ref={instagramPreviewRowRef}>
-              {visibleReels.map((item) => (
-                <a
-                  key={`${item.title}-preview`}
-                  href="https://www.instagram.com/standard__interiors?igsh=Z2xuaHEyNDhldmQx"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="instagram-preview-card"
-                >
-                  <img src={item.image} alt={item.title} loading="lazy" />
-                  <span className="instagram-preview-overlay">
-                    <strong>{item.title}</strong>
-                  </span>
-                </a>
-              ))}
-            </div>
-          </div>
-
-          <a
-            href="https://www.instagram.com/standard__interiors?igsh=Z2xuaHEyNDhldmQx"
-            target="_blank"
-            rel="noreferrer"
-            className="instagram-more-btn"
-          >
-            View More on Instagram
-          </a>
-        </section>
-
-        <motion.section id="contact" className="section contact-section" {...revealInViewProps()}>
-          <motion.div className="contact-left" {...revealInViewProps(0.02)}>
-            <h3>Get in Touch</h3>
-            <p>Phone: +91 9539120466</p>
-            <p>WhatsApp: wa.me/919947015742</p>
-            <p>Instagram: @standard__interiors</p>
-            <p>Areas:</p>
-            <p>EDAVANNAPPARA | AREEKODE | KONDOTTY | VAZHAKKAD | MUKKAM | KIZHISSERI</p>
-            <a href="https://wa.me/919947015742" target="_blank" rel="noreferrer" className="btn-green">WhatsApp Us</a>
-          </motion.div>
-          <motion.form className="contact-form" onSubmit={submitForm} {...revealInViewProps(0.08)}>
-            <input name="name" placeholder="Name" required disabled={formSubmitting} />
-            <input name="phone" placeholder="Phone / WhatsApp" required disabled={formSubmitting} />
-            <select name="service" required defaultValue="" disabled={formSubmitting}>
-              <option value="" disabled>Select service</option>
-              {services.map((service) => (
-                <option key={service.title} value={service.title}>{service.title}</option>
-              ))}
-            </select>
-            <textarea name="message" placeholder="Tell us your requirements" rows="5" required disabled={formSubmitting} />
-            <button type="submit" className="btn-dark" disabled={formSubmitting}>
-              {formSubmitting ? 'Sending...' : 'Send Message'}
-            </button>
-            {formMessage && (
-              <motion.div
-                className={`form-message form-message-${formMessage.type}`}
-                initial={reduceMotion ? false : { opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-              >
-                {formMessage.text}
-              </motion.div>
-            )}
-          </motion.form>
-        </motion.section>
+        <ContactSection
+          onSubmitForm={submitForm}
+          formSubmitting={formSubmitting}
+          formMessage={formMessage}
+          services={services}
+          reduceMotion={reduceMotion}
+        />
 
         <motion.section className="partners-band" {...revealInViewProps()}>
           <div className="partners-marquee" aria-label="Trusted partners">
@@ -669,7 +643,7 @@ function App() {
           <div>
             <h4>Contact Info</h4>
             <div className="footer-links">
-              <span>Kerala, India</span>
+              <span>Edavannappara, Malappuram, Kerala</span>
               <a href="tel:+919539120466">+91 9539120466</a>
               <a href="https://wa.me/919947015742" target="_blank" rel="noreferrer">wa.me/919947015742</a>
               <a href="https://www.instagram.com/standard__interiors/" target="_blank" rel="noreferrer">@standard__interiors</a>
@@ -680,7 +654,7 @@ function App() {
         <div className="footer-bottom">© 2026 Standard Interiors. All rights reserved.</div>
       </motion.footer>
 
-      <a className="float-whatsapp" href="https://wa.me/919947015742" target="_blank" rel="noreferrer" aria-label="WhatsApp">
+      <a className="float-whatsapp" href="https://wa.me/919947015742" target="_blank" rel="noreferrer" aria-label="Chat on WhatsApp with Standard Interiors">
         WA
       </a>
 
@@ -710,6 +684,7 @@ function App() {
           </motion.div>
         )}
       </AnimatePresence>
+      </motion.div>
     </div>
   );
 }

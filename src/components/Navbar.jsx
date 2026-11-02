@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import logo from '../../assets/logo/standard-interiors-logo.png';
+const logo = '/standard interiors Logo.png';
 
 const REVEAL_EASE = [0.22, 1, 0.36, 1];
 

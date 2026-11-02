@@ -1,17 +1,8 @@
 import React, { memo, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
-const FADE_DURATION = 0.4;
 const REVEAL_EASE = [0.22, 1, 0.36, 1];
 const REVEAL_DURATION = 0.58;
-
-const fadeVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { duration: FADE_DURATION, ease: REVEAL_EASE }
-  }
-};
 
 const ContactSection = memo(({ onSubmitForm, formSubmitting, formMessage, services, reduceMotion }) => {
   const servicesList = useMemo(() => services || [], [services]);
@@ -39,7 +30,7 @@ const ContactSection = memo(({ onSubmitForm, formSubmitting, formMessage, servic
   return (
     <motion.section id="contact" className="section contact-section" {...revealInViewProps()}>
       <motion.div className="contact-left" {...revealInViewProps(0.02)}>
-        <h3>Get in Touch</h3>
+        <h2>Get in Touch</h2>
         <p>Phone: +91 9539120466</p>
         <p>WhatsApp: wa.me/919947015742</p>
         <p>Instagram: @standard__interiors</p>
@@ -48,15 +39,15 @@ const ContactSection = memo(({ onSubmitForm, formSubmitting, formMessage, servic
         <a href="https://wa.me/919947015742" target="_blank" rel="noreferrer" className="btn-green">WhatsApp Us</a>
       </motion.div>
       <motion.form className="contact-form" onSubmit={onSubmitForm} {...revealInViewProps(0.08)}>
-        <input name="name" placeholder="Name" required disabled={formSubmitting} />
-        <input name="phone" placeholder="Phone / WhatsApp" required disabled={formSubmitting} />
-        <select name="service" required defaultValue="" disabled={formSubmitting}>
+        <input name="name" placeholder="Name" required disabled={formSubmitting} aria-label="Your Name" />
+        <input name="phone" placeholder="Phone / WhatsApp" required disabled={formSubmitting} aria-label="Phone or WhatsApp Number" />
+        <select name="service" required defaultValue="" disabled={formSubmitting} aria-label="Select Interior Service">
           <option value="" disabled>Select service</option>
           {servicesList.map((service) => (
             <option key={service.title} value={service.title}>{service.title}</option>
           ))}
         </select>
-        <textarea name="message" placeholder="Tell us your requirements" rows="5" required disabled={formSubmitting} />
+        <textarea name="message" placeholder="Tell us your requirements" rows="5" required disabled={formSubmitting} aria-label="Tell us your requirements" />
         <button type="submit" className="btn-dark" disabled={formSubmitting}>
           {formSubmitting ? 'Sending...' : 'Send Message'}
         </button>
